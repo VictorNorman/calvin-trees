@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MapComponent } from '@maplibre/ngx-maplibre-gl';
 import { LngLat } from 'maplibre-gl';
 
 interface TreeInfo {
@@ -23,6 +24,8 @@ export class HomePage implements AfterViewInit {
   public center: LngLat = new LngLat(this.defaultLng, this.defaultLat);
   heading: [number] | undefined = undefined;
   errorMsg: string = '';
+
+  @ViewChild('map') map: MapComponent | null = null;
 
   private readonly treesDb: TreeInfo[] = [
     {
@@ -53,7 +56,7 @@ export class HomePage implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-
+    setTimeout(() => this.map!.mapInstance.resize(), 0);
   }
 
   highlightNearbyTrees() {
