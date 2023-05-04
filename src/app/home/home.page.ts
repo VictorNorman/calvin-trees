@@ -31,7 +31,12 @@ export class HomePage implements AfterViewInit {
     {
       lng: -85.59002609659022,
       lat: 42.932341568753785,
-      description: "A happy tree!",
+      description: "Fancy pine",
+    },
+    {
+      lng: -85.591,
+      lat: 42.93245,
+      description: "Redwood",
     }
   ];
 
@@ -60,8 +65,28 @@ export class HomePage implements AfterViewInit {
   }
 
   highlightNearbyTrees() {
-    this.nearbyTrees = this.treesDb.filter(tree =>
-      this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 10  // meters
-    );
+    // setInterval(() => {
+    //   if (this.nearbyTrees) {
+    //     this.nearbyTrees = [];
+    //   } else {
+    this.nearbyTrees = this.treesDb;
+    //   }
+    //   console.log("hi");
+    // }, 2000);
+    // this.nearbyTrees = this.treesDb.filter(tree =>
+    //   this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 10  // meters
+    // );
   }
 }
+
+
+/*
+To get tree info:
+https://services2.arcgis.com/DBcRJmfPI2l07jMS/ArcGIS/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/113?f=json
+last number is 1 - 113.
+
+Don't know how to get all trees...
+
+https://services2.arcgis.com/DBcRJmfPI2l07jMS/ArcGIS/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/getEstimates/?f=pjson
+
+*/
