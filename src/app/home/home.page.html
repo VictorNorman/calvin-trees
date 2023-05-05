@@ -25,7 +25,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.1.5
+        Calvin Trees v0.1.6
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -54,12 +54,10 @@
             <img src="https://services2.arcgis.com/DBcRJmfPI2l07jMS/arcgis/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/79/attachments/87" />
           </ion-thumbnail>
           <ion-card-header>
-            <ion-card-title>Common name</ion-card-title>
-            <ion-card-subtitle>Scientific Name</ion-card-subtitle>
+            <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
+            <ion-card-title>{{tree.commonName}}</ion-card-title>
           </ion-card-header>
-          <ion-card-content>
-            Commemorative information here.
-          </ion-card-content>
+          <ion-card-content>{{tree.commemoration}}</ion-card-content>
         </ion-card>
       </mgl-popup>
 
