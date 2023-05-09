@@ -14,6 +14,14 @@ interface TreeInfo {
   commemoration: string;
   attachmentURL?: string;
 }
+type AppMode = 'tour1' | 'wander' | 'tour2';
+
+
+// Bob Speelman's 12 favorite trees.
+const Tour1 = [
+  54, 23, 13, 24, 25, 43, 98, 93, 82, 88, 75, 84,
+];
+
 
 @Component({
   selector: 'app-home',
@@ -25,12 +33,15 @@ export class HomePage implements AfterViewInit {
   public imageLoaded = false;
 
   public nearbyTrees: TreeInfo[] = [];
+  public tour1Markers: TreeInfo[] = [];
 
   private defaultLng = -85.5871801;
   private defaultLat = 42.9308076;
   public center: LngLat = new LngLat(this.defaultLng, this.defaultLat);
   heading: [number] | undefined = undefined;
   errorMsg: string = '';
+
+  public mode: AppMode = 'wander';
 
   @ViewChild('map') map: MapComponent | null = null;
 
@@ -76,6 +87,19 @@ export class HomePage implements AfterViewInit {
       }
     });
 
+    this.tour1Markers = treeJson.features
+      .filter(tree => Tour1.includes(tree.id))
+      .map(tree => {
+        return {
+          treeId: tree.properties.OBJECTID,
+          lng: tree.geometry.coordinates[0],
+          lat: tree.geometry.coordinates[1],
+          scientificName: tree.properties.scientific,
+          commonName: tree.properties.common_nam,
+          commemoration: tree.properties.commemorat,
+        }
+      });
+
   }
 
   ngAfterViewInit() {
@@ -113,6 +137,18 @@ export class HomePage implements AfterViewInit {
         tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
       }
     });
+  }
+
+  public setMode(mode: AppMode) {
+    this.mode = mode;
+    console.log('mode set to ', mode);
+
+    if (mode == 'tour1') {
+      // clear all pop-ups
+      // (for now) put markers on the map for the tour trees.
+      console.table(this.tour1Markers);
+
+    }
   }
 }
 

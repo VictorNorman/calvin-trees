@@ -7,10 +7,10 @@
   <ion-content class="ion-padding">
     <ion-list>
       <ion-item>
-        <ion-button>Wander Mode</ion-button>
+        <ion-button (click)="setMode('wander')">Wander Mode</ion-button>
       </ion-item>
       <ion-item>
-        <ion-button>Tour 1</ion-button>
+        <ion-button (click)="setMode('tour1')">Tour 1</ion-button>
       </ion-item>
       <ion-item>
         <ion-button>Tour 2</ion-button>
@@ -25,7 +25,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.2.0
+        Calvin Trees v0.2.1 {{mode}}
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -48,18 +48,37 @@
         <ion-img src="assets/icons/arrow.png" anchor="top-left"></ion-img>
       </mgl-marker>
 
-      <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
-        <ion-card>
-          <ion-thumbnail *ngIf="tree.attachmentURL">
-            <img [src]="tree.attachmentURL" />
-          </ion-thumbnail>
-          <ion-card-header>
-            <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
-            <ion-card-title>{{tree.commonName}}</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>{{tree.commemoration}}</ion-card-content>
-        </ion-card>
-      </mgl-popup>
+      <div *ngIf="mode === 'wander'">
+        <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
+          <ion-card>
+            <ion-thumbnail *ngIf="tree.attachmentURL">
+              <img [src]="tree.attachmentURL" />
+            </ion-thumbnail>
+            <ion-card-header>
+              <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
+              <ion-card-title>{{tree.commonName}}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>{{tree.commemoration}}</ion-card-content>
+          </ion-card>
+        </mgl-popup>
+      </div>
+
+      <div *ngIf="mode === 'tour1'">
+        <mgl-geojson-source id="symbols-source">
+          <mgl-feature *ngFor="let marker of tour1Markers"
+            [geometry]="{
+              type: 'Point',
+              coordinates: [marker.lng, marker.lat]
+            }">
+          </mgl-feature>
+        </mgl-geojson-source>
+        <mgl-layer id="symbols" type="circle" source="symbols-source"
+          [paint]="{
+            'circle-color': 'green',
+            'circle-radius': 7,
+          }">
+        </mgl-layer>
+      </div>
 
     </mgl-map>
   </ion-content>
