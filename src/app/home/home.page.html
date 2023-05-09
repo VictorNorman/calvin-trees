@@ -78,6 +78,23 @@
             'circle-radius': 7,
           }">
         </mgl-layer>
+        <mgl-geojson-source id="tour1-path">
+          <mgl-feature [geometry]="tour1Json"></mgl-feature>
+        </mgl-geojson-source>
+        <mgl-layer
+          id="path"
+          type="line"
+          source="tour1-path"
+          [layout]="{
+            'line-join': 'round',
+            'line-cap': 'round'
+          }"
+          [paint]="{
+            'line-color': 'green',
+            'line-width': 4,
+          }"
+        >
+        </mgl-layer>
       </div>
 
     </mgl-map>
