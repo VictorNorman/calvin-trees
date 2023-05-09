@@ -25,7 +25,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.1.6
+        Calvin Trees v0.2.0
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -50,8 +50,8 @@
 
       <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
         <ion-card>
-          <ion-thumbnail>
-            <img src="https://services2.arcgis.com/DBcRJmfPI2l07jMS/arcgis/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/79/attachments/87" />
+          <ion-thumbnail *ngIf="tree.attachmentURL">
+            <img [src]="tree.attachmentURL" />
           </ion-thumbnail>
           <ion-card-header>
             <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>

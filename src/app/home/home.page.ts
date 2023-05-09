@@ -6,12 +6,13 @@ import { LngLat } from 'maplibre-gl';
 import treeJson from '../../assets/trees.json';
 
 interface TreeInfo {
+  treeId: number;
   lng: number;
   lat: number;
   commonName: string;
   scientificName: string;
   commemoration: string;
-  img?: string;
+  attachmentURL?: string;
 }
 
 @Component({
@@ -66,6 +67,7 @@ export class HomePage implements AfterViewInit {
 
     this.treesDb = treeJson.features.map((tree) => {
       return {
+        treeId: tree.properties.OBJECTID,
         lng: tree.geometry.coordinates[0],
         lat: tree.geometry.coordinates[1],
         scientificName: tree.properties.scientific,
@@ -84,6 +86,33 @@ export class HomePage implements AfterViewInit {
     this.nearbyTrees = this.treesDb.filter(tree =>
       this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 10  // meters
     );
+
+    // For each tree, we need to get attachment numbers. To do this, build a URL ending in,
+    // ...FeatureServer/7/{{tree.treeId}}/attachments?f=json. Using the REST API gives back a json object like this:
+    // {
+    //   "attachmentInfos" : [
+    //     {
+    //       "id": 70,
+    //       "parentObjectId": 97,
+    //       "name": "IMG_2084.JPG",
+    //       "contentType": "image/jpeg",
+    //       "size": 3880050,
+    //       "keywords": "",
+    //       "exifInfo": null
+    //     }
+    //   ]
+    // }
+    // Then build the image url: FeatureServer/7/{{tree.treeId}}/attachments/{{attachmentInfos[0].id}}
+    const baseURL = 'https://services2.arcgis.com/DBcRJmfPI2l07jMS/arcgis/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7';
+
+    this.nearbyTrees.forEach(async tree => {
+      const response = await fetch(`${baseURL}/${tree.treeId}/attachments?f=json`);
+      const treeAttachmentData = await response.json();
+      // console.log(JSON.stringify(treeAttachmentData, null, 2));
+      if (treeAttachmentData.attachmentInfos.length > 0) {
+        tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
+      }
+    });
   }
 }
 
@@ -98,5 +127,10 @@ Don't know how to get all trees...
 https://services2.arcgis.com/DBcRJmfPI2l07jMS/ArcGIS/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/getEstimates/?f=pjson
 
 https://services2.arcgis.com/DBcRJmfPI2l07jMS/ArcGIS/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&relationParam=&returnGeodetic=false&outFields=*&returnGeometry=true&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&defaultSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=
+
+Get attachments for a tree:
+https://services2.arcgis.com/DBcRJmfPI2l07jMS/ArcGIS/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7/78/attachments?f=json
+
+The id field indicates how to access the image.  end url with attachment/{{id}}
 
 */
