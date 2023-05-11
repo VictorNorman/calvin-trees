@@ -35,21 +35,37 @@
     <mgl-map #map [style]="'https://api.maptiler.com/maps/streets/style.json?key=ted09kFoNPzbRYuDTi5B'" [zoom]="[18]"
       [center]="center" [bearing]="heading" [pitch]="[15]">
 
-      <mgl-control mglGeolocate [positionOptions]="{enableHighAccuracy: true}" [trackUserLocation]="true"
-        position="top-left">
-      </mgl-control>
-      <mgl-control mglNavigation [showCompass]="true" position="bottom-left">
-      </mgl-control>
-      <mgl-control position="bottom-right">
-      Status: {{ statusMsg }}
-    </mgl-control>
-
+      <!-- central arrow: never moves -->
       <mgl-marker [lngLat]="center">
         <ion-img src="assets/icons/arrow.png" anchor="top-left"></ion-img>
       </mgl-marker>
 
-      <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]"
-        (popupOpen)="handlePopupOpen(tree)">
+      <!-- <mgl-control mglGeolocate [positionOptions]="{enableHighAccuracy: true}" [trackUserLocation]="true"
+        position="top-left">
+      </mgl-control> -->
+
+      <!-- <mgl-control mglNavigation [showCompass]="true" position="bottom-left">
+      </mgl-control> -->
+
+      <mgl-control position="bottom-right">
+        Status: {{ statusMsg }}
+      </mgl-control>
+
+      <!-- markers for nearbyTrees -->
+      <mgl-geojson-source id="nearby-trees-source">
+        <mgl-feature *ngFor="let marker of nearbyTrees" [geometry]="{
+                            type: 'Point',
+                            coordinates: [marker.lng, marker.lat]
+                          }">
+        </mgl-feature>
+      </mgl-geojson-source>
+      <mgl-layer id="tree-markers-layer" type="circle" source="nearby-trees-source" [paint]="{
+                          'circle-color': 'green',
+                          'circle-radius': 7,
+                        }">
+      </mgl-layer>
+
+      <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]" (popupOpen)="handlePopupOpen(tree)">
         <ion-card>
           <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
             <img [src]="tree.attachmentURL" />
@@ -66,24 +82,26 @@
       </mgl-popup>
 
       <div *ngIf="mode === 'tour1'">
+
         <!-- show round green markers for trees on the tour -->
-        <mgl-geojson-source id="symbols-source">
+        <mgl-geojson-source id="tour1-trees-source">
           <mgl-feature *ngFor="let marker of tour1Trees" [geometry]="{
               type: 'Point',
               coordinates: [marker.lng, marker.lat]
             }">
           </mgl-feature>
         </mgl-geojson-source>
-        <mgl-layer id="symbols" type="circle" source="symbols-source" [paint]="{
+        <mgl-layer id="tour1-trees-layer" type="circle" source="tour1-trees-source" [paint]="{
             'circle-color': 'green',
             'circle-radius': 7,
           }">
         </mgl-layer>
+
         <!-- show route between trees on the tour -->
-        <mgl-geojson-source id="tour1-path">
+        <mgl-geojson-source id="tour1-path-source">
           <mgl-feature [geometry]="tour1Json"></mgl-feature>
         </mgl-geojson-source>
-        <mgl-layer id="path" type="line" source="tour1-path" [layout]="{
+        <mgl-layer id="tour1-path-layer" type="line" source="tour1-path-source" [layout]="{
             'line-join': 'round',
             'line-cap': 'round'
           }" [paint]="{
