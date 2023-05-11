@@ -23,7 +23,7 @@ interface TourInfo {
   localImgFile: string;
 }
 
-const HOW_CLOSE_IS_CLOSE = 10;   // how close to be to see tree popup, in meters.
+const HOW_CLOSE_IS_CLOSE = 50;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
 const Tour1: TourInfo[] = [
@@ -65,6 +65,7 @@ export class HomePage implements AfterViewInit {
   public center: LngLat = new LngLat(this.defaultLng, this.defaultLat);
   heading: [number] | undefined = undefined;
   errorMsg: string = '';
+  statusMsg: string = '';
 
   public mode: AppMode = 'wander';
   public tour1Json: any = tour1Json.routes[0].geometry;
@@ -180,6 +181,15 @@ export class HomePage implements AfterViewInit {
       // (for now) put markers on the map for the tour trees.
       console.table(this.tour1Trees);
 
+    }
+  }
+
+  handlePopupOpen(tree: TreeInfo) {
+    if (!window.navigator || ! window.navigator.vibrate) {
+      this.statusMsg = 'No haptics';
+    } else {
+      window.navigator?.vibrate(200);
+      this.statusMsg = 'just vibrated!';
     }
   }
 }
