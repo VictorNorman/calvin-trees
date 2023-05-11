@@ -189,8 +189,12 @@ export class HomePage implements AfterViewInit {
       this.statusMsg = 'No haptics';
     } else {
       window.navigator?.vibrate(200);
-      this.statusMsg = 'just vibrated!';
     }
+  }
+
+  handleClick(tree: TreeInfo): void {
+    // this.statusMsg = 'just touched the popup';
+    // TODO: popup a larger window to show the image.
   }
 }
 
