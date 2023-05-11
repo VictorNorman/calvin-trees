@@ -18,15 +18,29 @@ interface TreeInfo {
 }
 type AppMode = 'tour1' | 'wander' | 'tour2';
 
+interface TourInfo {
+  id: number;
+  localImgFile: string;
+}
+
+const HOW_CLOSE_IS_CLOSE = 10;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
-const Tour1 = [
-  54, 23, 13, 24, 25, 43, 98, 93, 82, 88, 75, 84,
+const Tour1: TourInfo[] = [
+  { id: 54, localImgFile: 'IMG_2057.JPG' },
+  { id: 23, localImgFile: 'IMG_2173.JPG' },
+  { id: 13, localImgFile: 'IMG_2010.JPG' },
+  { id: 24, localImgFile: 'IMG_2032.JPG' },
+  { id: 25, localImgFile: 'IMG_2034.JPG' },
+  { id: 43, localImgFile: 'IMG_2036.JPG' },
+  { id: 98, localImgFile: 'IMG_2079.JPG' },
+  { id: 93, localImgFile: 'IMG_2120.JPG' },
+  { id: 82, localImgFile: 'IMG_2128.JPG' },
+  { id: 88, localImgFile: '' },
+  { id: 75, localImgFile: 'IMG_2102.JPG' },
+  { id: 84, localImgFile: 'IMG_2107.JPG' },
 ];
 
-const Tour1LocalImageFiles = [
-
-];
 
 interface GeometryType {
   type: string;
@@ -44,7 +58,7 @@ export class HomePage implements AfterViewInit {
   public imageLoaded = false;
 
   public nearbyTrees: TreeInfo[] = [];
-  public tour1Markers: TreeInfo[] = [];
+  public tour1Trees: TreeInfo[] = [];
 
   private defaultLng = -85.5871801;
   private defaultLat = 42.9308076;
@@ -99,8 +113,8 @@ export class HomePage implements AfterViewInit {
       }
     });
 
-    this.tour1Markers = treeJson.features
-      .filter(tree => Tour1.includes(tree.id))
+    this.tour1Trees = treeJson.features
+      .filter(tree => Tour1.findIndex((tourTree) => tree.id === tourTree.id) != -1)
       .map(tree => {
         return {
           treeId: tree.properties.OBJECTID,
@@ -118,8 +132,9 @@ export class HomePage implements AfterViewInit {
   }
 
   highlightNearbyTrees() {
-    this.nearbyTrees = this.treesDb.filter(tree =>
-      this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 200 // meters
+    const db2Use = this.mode === 'wander' ? this.treesDb : (this.mode === 'tour1' ? this.tour1Trees : []);
+    this.nearbyTrees = db2Use.filter(tree =>
+      this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < HOW_CLOSE_IS_CLOSE // meters
     );
 
     // For each tree, we need to get attachment numbers. To do this, build a URL ending in,
@@ -146,11 +161,11 @@ export class HomePage implements AfterViewInit {
       // console.log(JSON.stringify(treeAttachmentData, null, 2));
       if (treeAttachmentData.attachmentInfos.length > 0) {
         // if (fs.existsSync(`assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`)) {
-          // console.log('found local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
-          tree.localImgFile = `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`;
+        // console.log('found local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
+        tree.localImgFile = `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`;
         // } else {
-          // console.log('did NOT find local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
-          tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
+        // console.log('did NOT find local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
+        tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
         // }
       }
     });
@@ -163,7 +178,7 @@ export class HomePage implements AfterViewInit {
     if (mode == 'tour1') {
       // clear all pop-ups
       // (for now) put markers on the map for the tour trees.
-      console.table(this.tour1Markers);
+      console.table(this.tour1Trees);
 
     }
   }

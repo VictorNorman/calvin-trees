@@ -10,7 +10,7 @@
         <ion-button (click)="setMode('wander')">Wander Mode</ion-button>
       </ion-item>
       <ion-item>
-        <ion-button (click)="setMode('tour1')">Tour 1</ion-button>
+        <ion-button (click)="setMode('tour1')">Bob Speelman's Favs</ion-button>
       </ion-item>
       <ion-item>
         <ion-button>Tour 2</ion-button>
@@ -48,55 +48,47 @@
         <ion-img src="assets/icons/arrow.png" anchor="top-left"></ion-img>
       </mgl-marker>
 
-      <div *ngIf="mode === 'wander'">
-        <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
-          <ion-card>
-            <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
-              <img [src]="tree.attachmentURL" />
-            </ion-thumbnail>
-            <ion-thumbnail>
-              <img [src]="tree.localImgFile" />
-            </ion-thumbnail>
-            <ion-card-header>
-              <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
-              <ion-card-title>{{tree.commonName}}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>{{tree.commemoration}}</ion-card-content>
-          </ion-card>
-        </mgl-popup>
-      </div>
+      <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
+        <ion-card>
+          <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
+            <img [src]="tree.attachmentURL" />
+          </ion-thumbnail>
+          <ion-thumbnail>
+            <img [src]="tree.localImgFile" />
+          </ion-thumbnail>
+          <ion-card-header>
+            <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
+            <ion-card-title>{{tree.commonName}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>{{tree.commemoration}}</ion-card-content>
+        </ion-card>
+      </mgl-popup>
 
       <div *ngIf="mode === 'tour1'">
+        <!-- show round green markers for trees on the tour -->
         <mgl-geojson-source id="symbols-source">
-          <mgl-feature *ngFor="let marker of tour1Markers"
-            [geometry]="{
+          <mgl-feature *ngFor="let marker of tour1Trees" [geometry]="{
               type: 'Point',
               coordinates: [marker.lng, marker.lat]
             }">
           </mgl-feature>
         </mgl-geojson-source>
-        <mgl-layer id="symbols" type="circle" source="symbols-source"
-          [paint]="{
+        <mgl-layer id="symbols" type="circle" source="symbols-source" [paint]="{
             'circle-color': 'green',
             'circle-radius': 7,
           }">
         </mgl-layer>
+        <!-- show route between trees on the tour -->
         <mgl-geojson-source id="tour1-path">
           <mgl-feature [geometry]="tour1Json"></mgl-feature>
         </mgl-geojson-source>
-        <mgl-layer
-          id="path"
-          type="line"
-          source="tour1-path"
-          [layout]="{
+        <mgl-layer id="path" type="line" source="tour1-path" [layout]="{
             'line-join': 'round',
             'line-cap': 'round'
-          }"
-          [paint]="{
+          }" [paint]="{
             'line-color': 'green',
             'line-width': 4,
-          }"
-        >
+          }">
         </mgl-layer>
       </div>
 
