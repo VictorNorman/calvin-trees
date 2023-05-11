@@ -25,7 +25,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.2.1 {{mode}}
+        Calvin Trees v0.2.2 {{mode}}
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -51,8 +51,11 @@
       <div *ngIf="mode === 'wander'">
         <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]">
           <ion-card>
-            <ion-thumbnail *ngIf="tree.attachmentURL">
+            <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
               <img [src]="tree.attachmentURL" />
+            </ion-thumbnail>
+            <ion-thumbnail>
+              <img [src]="tree.localImgFile" />
             </ion-thumbnail>
             <ion-card-header>
               <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>

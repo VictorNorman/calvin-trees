@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { FeatureComponent, MapComponent } from '@maplibre/ngx-maplibre-gl';
+import { MapComponent } from '@maplibre/ngx-maplibre-gl';
 import { LngLat } from 'maplibre-gl';
 
 
@@ -14,6 +14,7 @@ interface TreeInfo {
   scientificName: string;
   commemoration: string;
   attachmentURL?: string;
+  localImgFile?: string;
 }
 type AppMode = 'tour1' | 'wander' | 'tour2';
 
@@ -21,6 +22,10 @@ type AppMode = 'tour1' | 'wander' | 'tour2';
 // Bob Speelman's 12 favorite trees.
 const Tour1 = [
   54, 23, 13, 24, 25, 43, 98, 93, 82, 88, 75, 84,
+];
+
+const Tour1LocalImageFiles = [
+
 ];
 
 interface GeometryType {
@@ -106,7 +111,6 @@ export class HomePage implements AfterViewInit {
           commemoration: tree.properties.commemorat,
         }
       });
-
   }
 
   ngAfterViewInit() {
@@ -115,7 +119,7 @@ export class HomePage implements AfterViewInit {
 
   highlightNearbyTrees() {
     this.nearbyTrees = this.treesDb.filter(tree =>
-      this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 10  // meters
+      this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < 200 // meters
     );
 
     // For each tree, we need to get attachment numbers. To do this, build a URL ending in,
@@ -141,7 +145,13 @@ export class HomePage implements AfterViewInit {
       const treeAttachmentData = await response.json();
       // console.log(JSON.stringify(treeAttachmentData, null, 2));
       if (treeAttachmentData.attachmentInfos.length > 0) {
-        tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
+        // if (fs.existsSync(`assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`)) {
+          // console.log('found local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
+          tree.localImgFile = `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`;
+        // } else {
+          // console.log('did NOT find local file ' + `assets/tree_imgs/${treeAttachmentData.attachmentInfos[0].name}`);
+          tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
+        // }
       }
     });
   }
