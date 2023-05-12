@@ -23,7 +23,7 @@ interface TourInfo {
   localImgFile: string;
 }
 
-const HOW_CLOSE_IS_CLOSE = 50;   // how close to be to see tree popup, in meters.
+const HOW_CLOSE_IS_CLOSE = 5000;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
 const Tour1: TourInfo[] = [
@@ -56,6 +56,8 @@ interface GeometryType {
 export class HomePage implements AfterViewInit {
 
   public imageLoaded = false;
+  public isTreePictureModalOpen = false;
+  public currentTree: TreeInfo | null = null;    // for when clicking on a popup to see the tree's full image.
 
   public nearbyTrees: TreeInfo[] = [];
   public tour1Trees: TreeInfo[] = [];
@@ -193,8 +195,8 @@ export class HomePage implements AfterViewInit {
   }
 
   handleClick(tree: TreeInfo): void {
-    // this.statusMsg = 'just touched the popup';
-    // TODO: popup a larger window to show the image.
+    this.currentTree = tree;
+    this.isTreePictureModalOpen = true;
   }
 }
 
