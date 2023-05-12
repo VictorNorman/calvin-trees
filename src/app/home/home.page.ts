@@ -23,7 +23,7 @@ interface TourInfo {
   localImgFile: string;
 }
 
-const HOW_CLOSE_IS_CLOSE = 5000;   // how close to be to see tree popup, in meters.
+const HOW_CLOSE_IS_CLOSE = 10;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
 const Tour1: TourInfo[] = [
@@ -116,18 +116,30 @@ export class HomePage implements AfterViewInit {
       }
     });
 
-    this.tour1Trees = treeJson.features
-      .filter(tree => Tour1.findIndex((tourTree) => tree.id === tourTree.id) != -1)
-      .map(tree => {
-        return {
-          treeId: tree.properties.OBJECTID,
-          lng: tree.geometry.coordinates[0],
-          lat: tree.geometry.coordinates[1],
-          scientificName: tree.properties.scientific,
-          commonName: tree.properties.common_nam,
-          commemoration: tree.properties.commemorat,
-        }
-      });
+    this.tour1Trees = Tour1.map((tourTree: TourInfo) => {
+      const jsonTree = treeJson.features.find((json) => json.id === tourTree.id)!;
+      return {
+        treeId: jsonTree.properties.OBJECTID,
+        lng: jsonTree.geometry.coordinates[0],
+        lat: jsonTree.geometry.coordinates[1],
+        scientificName: jsonTree.properties.scientific,
+        commonName: jsonTree.properties.common_nam,
+        commemoration: jsonTree.properties.commemorat,
+      }
+    })
+
+    // this.tour1Trees = treeJson.features
+    //   .filter(tree => Tour1.findIndex((tourTree) => tree.id === tourTree.id) != -1)
+    //   .map(tree => {
+    //     return {
+    //       treeId: tree.properties.OBJECTID,
+    //       lng: tree.geometry.coordinates[0],
+    //       lat: tree.geometry.coordinates[1],
+    //       scientificName: tree.properties.scientific,
+    //       commonName: tree.properties.common_nam,
+    //       commemoration: tree.properties.commemorat,
+    //     }
+    //   });
   }
 
   ngAfterViewInit() {
