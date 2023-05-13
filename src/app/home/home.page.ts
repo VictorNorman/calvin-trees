@@ -5,6 +5,7 @@ import { LngLat } from 'maplibre-gl';
 
 import treeJson from '../../assets/trees.json';
 import tour1Json from '../../assets/tour1_geojson.json';
+import { RadioGroupCustomEvent, SearchbarCustomEvent } from '@ionic/angular';
 
 interface TreeInfo {
   treeId: number;
@@ -69,12 +70,19 @@ export class HomePage implements AfterViewInit {
   errorMsg: string = '';
   statusMsg: string = '';
 
+  public showAllTreesChecked = false;
+  public searching = false;
+  public searchResult: TreeInfo[] = [];
+  public searchResultStr: string[] = [];
+  public selectedSearchResults: boolean[] = []
+  public selectAllSelected = false;
+
   public mode: AppMode = 'wander';
   public tour1Json: any = tour1Json.routes[0].geometry;
 
   @ViewChild('map') map: MapComponent | null = null;
 
-  private readonly treesDb: TreeInfo[] = [
+  public treesDb: TreeInfo[] = [
     // {
     //   lng: -85.59002609659022,
     //   lat: 42.932341568753785,
@@ -126,24 +134,15 @@ export class HomePage implements AfterViewInit {
         commonName: jsonTree.properties.common_nam,
         commemoration: jsonTree.properties.commemorat,
       }
-    })
-
-    // this.tour1Trees = treeJson.features
-    //   .filter(tree => Tour1.findIndex((tourTree) => tree.id === tourTree.id) != -1)
-    //   .map(tree => {
-    //     return {
-    //       treeId: tree.properties.OBJECTID,
-    //       lng: tree.geometry.coordinates[0],
-    //       lat: tree.geometry.coordinates[1],
-    //       scientificName: tree.properties.scientific,
-    //       commonName: tree.properties.common_nam,
-    //       commemoration: tree.properties.commemorat,
-    //     }
-    //   });
+    });
   }
 
   ngAfterViewInit() {
     setTimeout(() => this.map!.mapInstance.resize(), 0);
+  }
+
+  showAllTreesSelected() {
+    this.showAllTreesChecked = !this.showAllTreesChecked;
   }
 
   highlightNearbyTrees() {
@@ -186,20 +185,25 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  public setMode(mode: AppMode) {
-    this.mode = mode;
-    console.log('mode set to ', mode);
+  public modeChanged(event: Event) {
+    const ev = event as RadioGroupCustomEvent;
+    this.mode = ev.detail.value;
 
-    if (mode == 'tour1') {
-      // clear all pop-ups
-      // (for now) put markers on the map for the tour trees.
-      console.table(this.tour1Trees);
 
-    }
+
+    //   if (mode == 'tour1') {
+    //     // clear all pop-ups
+    //     // (for now) put markers on the map for the tour trees.
+    //     console.table(this.tour1Trees);
+    //   }
+    // }
+
+
   }
 
+
   handlePopupOpen(tree: TreeInfo) {
-    if (!window.navigator || ! window.navigator.vibrate) {
+    if (!window.navigator || !window.navigator.vibrate) {
       this.statusMsg = 'No haptics';
     } else {
       window.navigator?.vibrate(200);
@@ -210,6 +214,92 @@ export class HomePage implements AfterViewInit {
     this.currentTree = tree;
     this.isTreePictureModalOpen = true;
   }
+
+  // toggle search toolbar.
+  searchClicked() {
+    this.searchResult = [];
+    this.searchResultStr = []
+    this.selectedSearchResults = [];
+    this.searching = !this.searching;
+  }
+
+  doSearch(event: Event) {
+    const ev = event as SearchbarCustomEvent;
+    if (ev) {
+      console.log(ev.target!.value!.toLowerCase());
+      const searchTerm = ev.target!.value!.toLowerCase();
+      // if (searchTerm === '') {
+      //   this.searching = false;
+      //   this.searchResult = [];
+      //   return;
+      // }
+
+      this.searchResult = [];       // the trees in the search results
+      this.searchResultStr = [];    // the strings to display for search results
+      this.selectedSearchResults = [];
+      this.treesDb.forEach((tree) => {
+        let found = false;
+        if (tree.commonName.toLowerCase().indexOf(searchTerm) != -1) {
+          this.searchResultStr.push(tree.commonName);
+          found = true;
+          this.searchResult.push(tree);
+        } else if (tree.scientificName.toLowerCase().indexOf(searchTerm) != -1) {
+          this.searchResultStr.push(tree.scientificName);
+          found = true;
+        } else if (tree.commemoration.toLowerCase().indexOf(searchTerm) != -1) {
+          this.searchResultStr.push(tree.commemoration);
+          found = true;
+        }
+        if (found) {
+          this.searchResult.push(tree);
+          this.selectedSearchResults.push(false);
+        }
+      });
+    }
+  }
+
+  onSearchCancel() {
+    this.searching = false;
+    this.searchResult = [];
+    this.selectedSearchResults = [];
+  }
+
+  // i-th search result checkbox has been checked or unchecked.
+  searchSelectionChanged(i: number) {
+    this.selectedSearchResults[i] = !this.selectedSearchResults[i];
+    console.log('selectAllSelected = ', this.selectAllSelected);
+    console.table(this.selectedSearchResults);
+    // if all the boxes have been manually selected, then turn on the
+    // Select All checkbox.
+    if (!this.selectAllSelected && this.selectedSearchResults.every(x => x)) {
+      this.selectAllSelected = true;
+    }
+    // if any the boxes has been manually unselected, then turn off the
+    // Select All checkbox.
+    if (this.selectAllSelected && !this.selectedSearchResults.every(x => x)) {
+      this.selectAllSelected = false;
+    }
+  }
+
+  areNoSearchResultsSelected(): boolean {
+    return !this.selectedSearchResults.some(x => x);
+  }
+
+  selectAllCheckboxChanged() {
+    console.log("selcectAllCC");
+    this.selectAllSelected = !this.selectAllSelected;
+    if (this.selectAllSelected) {
+      for (let i = 0; i < this.selectedSearchResults.length; i++) {
+        this.selectedSearchResults[i] = true;
+      }
+    } else if (!this.selectAllSelected) {
+      for (let i = 0; i < this.selectedSearchResults.length; i++) {
+        this.selectedSearchResults[i] = false;
+      }
+    }
+  }
+
+
 }
 
 
@@ -244,5 +334,4 @@ Mapbox API token: pk.eyJ1IjoidnRuMiIsImEiOiJjbGhnbTNoNzcwOW9yM2pwOGl0emFpNjhyIn0
 
 Don't love these results...
 https://api.mapbox.com/directions/v5/mapbox/walking/-85.5887953328383%2C42.9292720330779%3B-85.5870504205405%2C42.9294823836051%3B-85.5852588262338%2C42.9294587907906%3B-85.5850631553403%2C42.9294710026847%3B-85.5857617648935%2C42.9302758203728%3B-85.5885371914382%2C42.9299075965584%3B-85.587076244573%2C42.9320003036711%3B-85.5868522531289%2C42.9330915086662%3B-85.5862032654683%2C42.9320615016371%3B-85.5864893434085%2C42.9344492637226%3B-85.5891379421623%2C42.9325158544232%3B-85.5891282735509%2C42.9315326049458?alternatives=true&continue_straight=true&geometries=geojson&language=en&overview=simplified&steps=true&access_token=pk.eyJ1IjoidnRuMiIsImEiOiJjbGhnbHpucGowNXBnM21xamxsNXBocGdjIn0.klEa91Svy8rM2OWA2bbMuA
-
 */
