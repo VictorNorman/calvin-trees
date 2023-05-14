@@ -113,7 +113,7 @@
       <!-- [closeOnClick]="false" -->
       <!-- [closeButton]="false" -->
       <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]" (popupOpen)="handlePopupOpen(tree)">
-        <ion-card (click)="handleClick(tree)">
+        <ion-card (click)="handleClickOnPopup(tree)">
           <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
             <img [src]="tree.attachmentURL" />
           </ion-thumbnail>

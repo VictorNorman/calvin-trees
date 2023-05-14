@@ -188,19 +188,7 @@ export class HomePage implements AfterViewInit {
   public modeChanged(event: Event) {
     const ev = event as RadioGroupCustomEvent;
     this.mode = ev.detail.value;
-
-
-
-    //   if (mode == 'tour1') {
-    //     // clear all pop-ups
-    //     // (for now) put markers on the map for the tour trees.
-    //     console.table(this.tour1Trees);
-    //   }
-    // }
-
-
   }
-
 
   handlePopupOpen(tree: TreeInfo) {
     if (!window.navigator || !window.navigator.vibrate) {
@@ -210,7 +198,7 @@ export class HomePage implements AfterViewInit {
     }
   }
 
-  handleClick(tree: TreeInfo): void {
+  handleClickOnPopup(tree: TreeInfo): void {
     this.currentTree = tree;
     this.isTreePictureModalOpen = true;
   }
@@ -225,37 +213,32 @@ export class HomePage implements AfterViewInit {
 
   doSearch(event: Event) {
     const ev = event as SearchbarCustomEvent;
-    if (ev) {
-      console.log(ev.target!.value!.toLowerCase());
-      const searchTerm = ev.target!.value!.toLowerCase();
-      // if (searchTerm === '') {
-      //   this.searching = false;
-      //   this.searchResult = [];
-      //   return;
-      // }
-
-      this.searchResult = [];       // the trees in the search results
-      this.searchResultStr = [];    // the strings to display for search results
-      this.selectedSearchResults = [];
-      this.treesDb.forEach((tree) => {
-        let found = false;
-        if (tree.commonName.toLowerCase().indexOf(searchTerm) != -1) {
-          this.searchResultStr.push(tree.commonName);
-          found = true;
-          this.searchResult.push(tree);
-        } else if (tree.scientificName.toLowerCase().indexOf(searchTerm) != -1) {
-          this.searchResultStr.push(tree.scientificName);
-          found = true;
-        } else if (tree.commemoration.toLowerCase().indexOf(searchTerm) != -1) {
-          this.searchResultStr.push(tree.commemoration);
-          found = true;
-        }
-        if (found) {
-          this.searchResult.push(tree);
-          this.selectedSearchResults.push(false);
-        }
-      });
+    if (!ev) {
+      return;
     }
+    const searchTerm = ev.target!.value!.toLowerCase();
+
+    this.searchResult = [];       // the trees in the search results
+    this.searchResultStr = [];    // the strings to display for search results
+    this.selectedSearchResults = [];
+    this.treesDb.forEach((tree) => {
+      let found = false;
+      if (tree.commonName.toLowerCase().indexOf(searchTerm) != -1) {
+        this.searchResultStr.push(tree.commonName);
+        found = true;
+        this.searchResult.push(tree);
+      } else if (tree.scientificName.toLowerCase().indexOf(searchTerm) != -1) {
+        this.searchResultStr.push(tree.scientificName);
+        found = true;
+      } else if (tree.commemoration.toLowerCase().indexOf(searchTerm) != -1) {
+        this.searchResultStr.push(tree.commemoration);
+        found = true;
+      }
+      if (found) {
+        this.searchResult.push(tree);
+        this.selectedSearchResults.push(false);
+      }
+    });
   }
 
   onSearchCancel() {
@@ -267,8 +250,6 @@ export class HomePage implements AfterViewInit {
   // i-th search result checkbox has been checked or unchecked.
   searchSelectionChanged(i: number) {
     this.selectedSearchResults[i] = !this.selectedSearchResults[i];
-    console.log('selectAllSelected = ', this.selectAllSelected);
-    console.table(this.selectedSearchResults);
     // if all the boxes have been manually selected, then turn on the
     // Select All checkbox.
     if (!this.selectAllSelected && this.selectedSearchResults.every(x => x)) {
@@ -286,7 +267,6 @@ export class HomePage implements AfterViewInit {
   }
 
   selectAllCheckboxChanged() {
-    console.log("selcectAllCC");
     this.selectAllSelected = !this.selectAllSelected;
     if (this.selectAllSelected) {
       for (let i = 0; i < this.selectedSearchResults.length; i++) {
@@ -298,9 +278,8 @@ export class HomePage implements AfterViewInit {
       }
     }
   }
-
-
 }
+
 
 
 /*
