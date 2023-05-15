@@ -156,6 +156,7 @@ export class HomePage implements AfterViewInit {
 
     // close the search box and results list.
     this.searching = false;
+    setTimeout(() => this.map!.mapInstance.resize(), 0);
   }
 
   highlightNearbyTrees() {
