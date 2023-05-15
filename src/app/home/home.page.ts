@@ -72,10 +72,11 @@ export class HomePage implements AfterViewInit {
 
   public showAllTreesChecked = false;
   public searching = false;
-  public searchResult: TreeInfo[] = [];
+  public searchResultTrees: TreeInfo[] = [];
   public searchResultStr: string[] = [];
   public selectedSearchResults: boolean[] = []
   public selectAllSelected = false;
+  public showOnlySearchedForTrees = false;
 
   public mode: AppMode = 'wander';
   public tour1Json: any = tour1Json.routes[0].geometry;
@@ -145,6 +146,18 @@ export class HomePage implements AfterViewInit {
     this.showAllTreesChecked = !this.showAllTreesChecked;
   }
 
+  // when the "Show markers for selected trees" button is clicked.
+  showMarkersForOnlySelectedTrees() {
+    // clear all markers
+    this.showAllTreesChecked = false;
+
+    // indicate we are showing only searched-for trees.
+    this.showOnlySearchedForTrees = true;
+
+    // close the search box and results list.
+    this.searching = false;
+  }
+
   highlightNearbyTrees() {
     const db2Use = this.mode === 'wander' ? this.treesDb : (this.mode === 'tour1' ? this.tour1Trees : []);
     this.nearbyTrees = db2Use.filter(tree =>
@@ -205,10 +218,11 @@ export class HomePage implements AfterViewInit {
 
   // toggle search toolbar.
   searchClicked() {
-    this.searchResult = [];
+    this.searchResultTrees = [];
     this.searchResultStr = []
     this.selectedSearchResults = [];
     this.searching = !this.searching;
+    this.selectAllSelected = false;
   }
 
   doSearch(event: Event) {
@@ -218,15 +232,21 @@ export class HomePage implements AfterViewInit {
     }
     const searchTerm = ev.target!.value!.toLowerCase();
 
-    this.searchResult = [];       // the trees in the search results
+    this.searchResultTrees = [];       // the trees in the search results
     this.searchResultStr = [];    // the strings to display for search results
     this.selectedSearchResults = [];
+    // don't show markers until we've finished searching.
+    this.showOnlySearchedForTrees = false;
+
+    if (searchTerm === '') {
+      return;
+    }
     this.treesDb.forEach((tree) => {
       let found = false;
       if (tree.commonName.toLowerCase().indexOf(searchTerm) != -1) {
         this.searchResultStr.push(tree.commonName);
         found = true;
-        this.searchResult.push(tree);
+        this.searchResultTrees.push(tree);
       } else if (tree.scientificName.toLowerCase().indexOf(searchTerm) != -1) {
         this.searchResultStr.push(tree.scientificName);
         found = true;
@@ -235,7 +255,8 @@ export class HomePage implements AfterViewInit {
         found = true;
       }
       if (found) {
-        this.searchResult.push(tree);
+        this.searchResultTrees.push(tree);
+        // set selection box for this tree to "not checked".
         this.selectedSearchResults.push(false);
       }
     });
@@ -243,8 +264,11 @@ export class HomePage implements AfterViewInit {
 
   onSearchCancel() {
     this.searching = false;
-    this.searchResult = [];
+    this.searchResultTrees = [];
+    this.searchResultStr = [];
     this.selectedSearchResults = [];
+    this.selectAllSelected = false;
+    this.showOnlySearchedForTrees = false;
   }
 
   // i-th search result checkbox has been checked or unchecked.
