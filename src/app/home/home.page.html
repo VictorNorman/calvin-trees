@@ -32,7 +32,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.2.4 {{mode}}
+        Calvin Trees v0.2.5
       </ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="searchClicked()">
@@ -117,9 +117,6 @@
 
       <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]" (popupOpen)="handlePopupOpen(tree)">
         <ion-card (click)="handleClickOnPopup(tree)">
-          <ion-thumbnail *ngIf="tree.attachmentURL && !tree.localImgFile">
-            <img [src]="tree.attachmentURL" />
-          </ion-thumbnail>
           <ion-thumbnail>
             <img [src]="tree.localImgFile" />
           </ion-thumbnail>

@@ -6,6 +6,7 @@ import { LngLat } from 'maplibre-gl';
 import treeJson from '../../assets/trees.json';
 import tour1Json from '../../assets/tour1_geojson.json';
 import { RadioGroupCustomEvent, SearchbarCustomEvent } from '@ionic/angular';
+import { treeImgs } from '../../assets/treeId2Img';
 
 interface TreeInfo {
   treeId: number;
@@ -14,7 +15,7 @@ interface TreeInfo {
   commonName: string;
   scientificName: string;
   commemoration: string;
-  attachmentURL?: string;
+  // attachmentURL?: string;
   localImgFile?: string;
 }
 type AppMode = 'tour1' | 'wander' | 'tour2';
@@ -165,6 +166,15 @@ export class HomePage implements AfterViewInit {
       this.center.distanceTo(new LngLat(tree.lng, tree.lat)) < HOW_CLOSE_IS_CLOSE // meters
     );
 
+
+    // get the tree.localImgFile by mapping from the tree id to the img name using treeImgs
+    // that was imported from treeId2Img.ts in assets/ directory.
+
+    this.nearbyTrees.forEach(tree => {
+      const res = treeImgs.find((t) => t.treeId === tree.treeId);
+      tree.localImgFile = res ? `assets/tree_imgs/IMG_${res.imgId}.JPG` : '';
+    });
+
     // For each tree, we need to get attachment numbers. To do this, build a URL ending in,
     // ...FeatureServer/7/{{tree.treeId}}/attachments?f=json. Using the REST API gives back a json object like this:
     // {
@@ -180,11 +190,10 @@ export class HomePage implements AfterViewInit {
     //     }
     //   ]
     // }
-    // Then build the image url: FeatureServer/7/{{tree.treeId}}/attachments/{{attachmentInfos[0].id}}
+    /*
+       All old stuff when retriving images from the online databas, which used a l9ot of bandwidth.
+          const response = await fetch(`${baseURL}/${tree.treeId}/attachments?f=json`);
     const baseURL = 'https://services2.arcgis.com/DBcRJmfPI2l07jMS/arcgis/rest/services/Calvin_Campus_Speelman_Arboretum_WFL1/FeatureServer/7';
-
-    this.nearbyTrees.forEach(async tree => {
-      const response = await fetch(`${baseURL}/${tree.treeId}/attachments?f=json`);
       const treeAttachmentData = await response.json();
       // console.log(JSON.stringify(treeAttachmentData, null, 2));
       if (treeAttachmentData.attachmentInfos.length > 0) {
@@ -196,7 +205,7 @@ export class HomePage implements AfterViewInit {
         tree.attachmentURL = `${baseURL}/${tree.treeId}/attachments/${treeAttachmentData.attachmentInfos[0].id}`;
         // }
       }
-    });
+ */
   }
 
   public modeChanged(event: Event) {
