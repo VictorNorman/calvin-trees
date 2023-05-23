@@ -185,9 +185,9 @@
         <ion-content>
           <img [src]="currentTree!.localImgFile" />
           <ion-item lines="none">
-            <div class="center-text">
-              {{currentTree?.commonName}}
-            </div>
+            <div class="center-text">{{currentTree?.commonName}}</div>
+            <div class="center-text">{{currentTree?.treeId}}</div>
+            <div class="center-text">{{currentTree?.localImgFile}}</div>
           </ion-item>
         </ion-content>
       </ng-template>
