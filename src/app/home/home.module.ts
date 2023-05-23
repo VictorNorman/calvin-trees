@@ -6,6 +6,7 @@ import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
 import { NgxMapLibreGLModule } from '@maplibre/ngx-maplibre-gl';
+import { ShowTreeMarkersComponent } from '../show-tree-markers/show-tree-markers.component';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { NgxMapLibreGLModule } from '@maplibre/ngx-maplibre-gl';
     IonicModule,
     HomePageRoutingModule,
     NgxMapLibreGLModule,
+    ShowTreeMarkersComponent,
   ],
   declarations: [HomePage]
 })

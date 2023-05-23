@@ -10,7 +10,7 @@ mgl-map {
 
 // ng-deep is deprecated but I don't know of an alternative.
 ::ng-deep .maplibregl-popup-content {
-  color: green;
+  color: darkgreen;
   border-radius: 5px;
   padding: 0px 5px;
 }
@@ -28,4 +28,20 @@ mgl-map {
 .tree-search-list {
   padding-top: 0px;
   padding-bottom: 0px;
+}
+
+.no-padding {
+  --ion-grid-padding: 0;
+}
+
+.display-block {
+  display: block;
+}
+
+.common-name {
+  font-size: larger;
+}
+
+.black-text {
+  color: black;
 }

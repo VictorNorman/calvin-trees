@@ -2,13 +2,12 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MapComponent } from '@maplibre/ngx-maplibre-gl';
 import { LngLat } from 'maplibre-gl';
 
-
 import treeJson from '../../assets/trees.json';
 import tour1Json from '../../assets/tour1_geojson.json';
 import { RadioGroupCustomEvent, SearchbarCustomEvent } from '@ionic/angular';
 import { treeImgs } from '../../assets/treeId2Img';
 
-interface TreeInfo {
+export interface TreeInfo {
   treeId: number;
   lng: number;
   lat: number;
@@ -25,7 +24,7 @@ interface TourInfo {
   localImgFile: string;
 }
 
-const HOW_CLOSE_IS_CLOSE = 10;   // how close to be to see tree popup, in meters.
+const HOW_CLOSE_IS_CLOSE = 1000;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
 const Tour1: TourInfo[] = [

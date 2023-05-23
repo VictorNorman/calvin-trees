@@ -16,8 +16,7 @@
       </ion-radio-group>
       <ion-item></ion-item>
       <ion-item>
-        <ion-checkbox [checked]="showAllTreesChecked"
-          (ionChange)="showAllTreesSelected()">
+        <ion-checkbox [checked]="showAllTreesChecked" (ionChange)="showAllTreesSelected()">
           Show all tree markers
         </ion-checkbox>
       </ion-item>
@@ -32,7 +31,7 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>
-        Calvin Trees v0.2.5
+        Calvin Trees v0.2.8
       </ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="searchClicked()">
@@ -86,46 +85,30 @@
       </mgl-control>
 
       <!-- markers for nearbyTrees -->
-      <mgl-geojson-source id="nearby-trees-source">
-        <mgl-feature *ngFor="let marker of nearbyTrees" [geometry]="{
-                            type: 'Point',
-                            coordinates: [marker.lng, marker.lat]
-                          }">
-        </mgl-feature>
-      </mgl-geojson-source>
-      <mgl-layer id="tree-markers-layer" type="circle" source="nearby-trees-source" [paint]="{
-                          'circle-color': 'green',
-                          'circle-radius': 7,
-                        }">
-      </mgl-layer>
+      <app-show-tree-markers id="nearby-trees" color="green" [markerRadius]=7 [treesList]="nearbyTrees">
+      </app-show-tree-markers>
 
       <!-- show round maroon markers for all known trees -->
       <div *ngIf="showAllTreesChecked">
-        <mgl-geojson-source id="all-trees-source">
-          <mgl-feature *ngFor="let marker of treesDb" [geometry]="{
-                      type: 'Point',
-                      coordinates: [marker.lng, marker.lat]
-                    }">
-          </mgl-feature>
-        </mgl-geojson-source>
-        <mgl-layer id="all-trees-layer" type="circle" source="all-trees-source" [paint]="{
-                    'circle-color': 'maroon',
-                    'circle-radius': 5,
-                  }">
-        </mgl-layer>
+        <app-show-tree-markers id="all-trees" [treesList]="treesDb" color="maroon" [markerRadius]=5>
+        </app-show-tree-markers>
       </div>
 
       <mgl-popup *ngFor="let tree of nearbyTrees" [lngLat]="[tree.lng, tree.lat]" (popupOpen)="handlePopupOpen(tree)">
-        <ion-card (click)="handleClickOnPopup(tree)">
-          <ion-thumbnail>
-            <img [src]="tree.localImgFile" />
-          </ion-thumbnail>
-          <ion-card-header>
-            <ion-card-subtitle>{{tree.scientificName}}</ion-card-subtitle>
-            <ion-card-title>{{tree.commonName}}</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>{{tree.commemoration}}</ion-card-content>
-        </ion-card>
+        <div (click)="handleClickOnPopup(tree)">
+          <ion-grid class="no-padding">
+            <ion-row>
+              <ion-col size="4">
+                <img [src]="tree.localImgFile" />
+              </ion-col>
+              <ion-col>
+                <ion-note class="display-block">{{tree.scientificName}}</ion-note>
+                <ion-text class="display-block common-name">{{tree.commonName}}</ion-text>
+                <ion-text class="display-block black-text">{{tree.commemoration}}</ion-text>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
       </mgl-popup>
 
       <div *ngIf="mode === 'tour1'">
@@ -133,18 +116,8 @@
         <!-- If user is searching for a tree, don't show all tour trees -->
         <div *ngIf="!showOnlySearchedForTrees">
           <!-- show round green markers for trees on the tour -->
-          <mgl-geojson-source id="tour1-trees-source">
-            <mgl-feature *ngFor="let marker of tour1Trees" [geometry]="{
-              type: 'Point',
-              coordinates: [marker.lng, marker.lat]
-            }">
-            </mgl-feature>
-          </mgl-geojson-source>
-          <mgl-layer id="tour1-trees-layer" type="circle" source="tour1-trees-source" [paint]="{
-            'circle-color': 'green',
-            'circle-radius': 7,
-          }">
-          </mgl-layer>
+          <app-show-tree-markers id="tour1" [treesList]="tour1Trees" color="green" [markerRadius]=7>
+          </app-show-tree-markers>
         </div>
 
         <!-- show route between trees on the tour -->
@@ -163,20 +136,9 @@
 
       <!-- show round gold markers for all trees selected when searched -->
       <div *ngIf="showOnlySearchedForTrees">
-        <mgl-geojson-source id="search-trees-source">
-          <mgl-feature *ngFor="let marker of searchResultTrees" [geometry]="{
-                            type: 'Point',
-                            coordinates: [marker.lng, marker.lat]
-                          }">
-          </mgl-feature>
-        </mgl-geojson-source>
-        <mgl-layer id="search-trees-layer" type="circle" source="search-trees-source" [paint]="{
-                          'circle-color': 'gold',
-                          'circle-radius': 5,
-                        }">
-        </mgl-layer>
+        <app-show-tree-markers id="search-trees" [treesList]="searchResultTrees" color="gold" [markerRadius]=5>
+        </app-show-tree-markers>
       </div>
-
 
     </mgl-map>
 
@@ -186,7 +148,11 @@
           <img [src]="currentTree!.localImgFile" />
           <ion-item lines="none">
             <div class="center-text">{{currentTree?.commonName}}</div>
+          </ion-item>
+          <ion-item>
             <div class="center-text">{{currentTree?.treeId}}</div>
+          </ion-item>
+          <ion-item>
             <div class="center-text">{{currentTree?.localImgFile}}</div>
           </ion-item>
         </ion-content>
