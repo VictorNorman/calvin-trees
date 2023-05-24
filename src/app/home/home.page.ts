@@ -24,7 +24,7 @@ interface TourInfo {
   localImgFile: string;
 }
 
-const HOW_CLOSE_IS_CLOSE = 1000;   // how close to be to see tree popup, in meters.
+const HOW_CLOSE_IS_CLOSE = 10;   // how close to be to see tree popup, in meters.
 
 // Bob Speelman's 12 favorite trees.
 const Tour1: TourInfo[] = [
